@@ -1,5 +1,5 @@
 // FullScreenModal.js
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Modal,
   ModalOverlay,
@@ -23,8 +23,10 @@ import { useQuery } from '@tanstack/react-query';
 import Select from 'react-dropdown-select';
 import { processAnimeName, processEpisodeList } from '../helpers/DataProcessor';
 import AnimeDetails from './AnimeDetail';
+import { IoMdArrowRoundBack } from 'react-icons/io';
 
 const PlayerModal = ({ videoUrl, onClose }) => {
+  const [currentEpisode, setCurrentEpisode] = useState([]);
   const { data, isLoading } = useQuery({
     queryFn: async () => {
       return await fetchData(`/watch${videoUrl}`);
@@ -45,11 +47,17 @@ const PlayerModal = ({ videoUrl, onClose }) => {
 
   const episodesOptions = useMemo(() => {
     return processEpisodeList(episodes, videoUrl) || [];
-  }, [episodes]);
+  }, [episodes, videoUrl]);
 
   const onEpisodeChange = (val) => {
-    console.log('CCC:::', val);
+    setCurrentEpisode(val);
   };
+
+  useEffect(() => {
+    if (episodesOptions && episodesOptions?.length > 0) {
+      setCurrentEpisode([episodesOptions?.find((el) => el.value === videoUrl)]);
+    }
+  }, [episodesOptions, videoUrl]);
 
   const currentAnime = useMemo(() => {
     if (data?.data?.animeInfo) {
@@ -69,19 +77,19 @@ const PlayerModal = ({ videoUrl, onClose }) => {
   return (
     <Modal isOpen={true} onClose={onClose} size="full">
       <ModalOverlay />
-      <ModalContent maxH="80vh">
+      <ModalContent maxH="80vh" overflow={'hidden'}>
         <ModalHeader>
-          <IconButton icon="arrow-back" onClick={onClose} />
+          <IconButton icon={<IoMdArrowRoundBack />} onClick={onClose} />
         </ModalHeader>
         <ModalCloseButton />
-        <ModalBody>
-          <Flex>
-            <Box flex="1">
+        <ModalBody overflow={'auto'}>
+          <Flex gap={4}>
+            <Box flex="1" height={'100%'}>
               {vidSrc && <VideoPlayer url={vidSrc} />}
               <HStack spacing={4} mt={4}>
                 <Box fontWeight="bold">Episodes:</Box>
                 <Select
-                  values={[]}
+                  values={currentEpisode}
                   onChange={(val) => onEpisodeChange(val)}
                   options={episodesOptions}
                   loading={episodesOptions?.length === 0}
