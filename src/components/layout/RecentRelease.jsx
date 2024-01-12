@@ -58,6 +58,7 @@ const RecentRelease = () => {
         <PlayerModal
           videoUrl={selectedAnimeUrl}
           onClose={() => handleCardClick(null)} // Close the modal
+          changeVideoUrl={handleCardClick}
         />
       )}
     </Box>

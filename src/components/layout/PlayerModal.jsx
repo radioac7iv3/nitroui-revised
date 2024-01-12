@@ -1,5 +1,5 @@
 // FullScreenModal.js
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Modal,
   ModalOverlay,
@@ -25,7 +25,7 @@ import { processAnimeName, processEpisodeList } from '../helpers/DataProcessor';
 import AnimeDetails from './AnimeDetail';
 import { IoMdArrowRoundBack } from 'react-icons/io';
 
-const PlayerModal = ({ videoUrl, onClose }) => {
+const PlayerModal = ({ videoUrl, onClose, changeVideoUrl }) => {
   const [currentEpisode, setCurrentEpisode] = useState([]);
   const { data, isLoading } = useQuery({
     queryFn: async () => {
@@ -49,9 +49,12 @@ const PlayerModal = ({ videoUrl, onClose }) => {
     return processEpisodeList(episodes, videoUrl) || [];
   }, [episodes, videoUrl]);
 
-  const onEpisodeChange = (val) => {
-    setCurrentEpisode(val);
-  };
+  const onEpisodeChange = useCallback((val) => {
+    if (val) {
+      setCurrentEpisode(val);
+      changeVideoUrl(val[0].value);
+    }
+  }, []);
 
   useEffect(() => {
     if (episodesOptions && episodesOptions?.length > 0) {
@@ -62,10 +65,14 @@ const PlayerModal = ({ videoUrl, onClose }) => {
   const currentAnime = useMemo(() => {
     if (data?.data?.animeInfo) {
       return data?.data?.animeInfo;
-    } else return null;
-  }, [data]);
+    }
+  }, [data?.data?.animeInfo]);
 
-  const { data: animeDetail } = useQuery({
+  const {
+    data: animeDetail,
+    isLoading: isFetchingAnime,
+    isFetching: fetchingAnime,
+  } = useQuery({
     queryFn: async () => {
       return await fetchData(`/details/${currentAnime}`);
     },
@@ -73,6 +80,13 @@ const PlayerModal = ({ videoUrl, onClose }) => {
     enabled: !!currentAnime,
     staleTime: 1200000,
   });
+
+  // const currentAnimeDetail = useMemo(() => {
+  //   if (animeDetail?.data?.animeInfo) {
+  //     return animeDetail?.data?.animeInfo;
+  //   }
+  // }, [animeDetail?.data?.animeInfo]);
+  // console.log('ANIMEdetail::', animeDetail, fetchingAnime, currentAnimeDetail);
 
   return (
     <Modal isOpen={true} onClose={onClose} size="full">
@@ -102,7 +116,7 @@ const PlayerModal = ({ videoUrl, onClose }) => {
                 />
               </HStack>
             </Box>
-            {animeDetail && (
+            {!fetchingAnime && (
               <Box flex="1">
                 <AnimeDetails animeDetail={animeDetail?.data?.animeInfo} />
               </Box>
