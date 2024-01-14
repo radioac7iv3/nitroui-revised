@@ -1,5 +1,5 @@
 // FullScreenModal.js
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -16,23 +16,31 @@ import {
   Link,
   HStack,
   Flex,
-} from '@chakra-ui/react';
-import VideoPlayer from '../video/videoPlayer';
-import { fetchData } from '../../services/api';
-import { useQuery } from '@tanstack/react-query';
-import Select from 'react-dropdown-select';
-import { processAnimeName, processEpisodeList } from '../helpers/DataProcessor';
-import AnimeDetails from './AnimeDetail';
-import { IoMdArrowRoundBack } from 'react-icons/io';
+} from "@chakra-ui/react";
+import VideoPlayer from "../video/videoPlayer";
+import { fetchData } from "../../services/api";
+import { useQuery, QueryCache } from "@tanstack/react-query";
+import Select from "react-dropdown-select";
+import { processAnimeName, processEpisodeList } from "../helpers/DataProcessor";
+import AnimeDetails from "./AnimeDetail";
+import { IoMdArrowRoundBack } from "react-icons/io";
 
-const PlayerModal = ({ videoUrl, onClose, changeVideoUrl }) => {
+const PlayerModal = ({
+  videoUrl,
+  onClose,
+  changeVideoUrl,
+  currentStreamingAnime = null,
+}) => {
+  const queryCache = new QueryCache({});
   const [currentEpisode, setCurrentEpisode] = useState([]);
+  const [currentAnime, setCurrentAnime] = useState(currentStreamingAnime ?? "");
   const { data, isLoading } = useQuery({
     queryFn: async () => {
       return await fetchData(`/watch${videoUrl}`);
     },
     queryKey: [`${videoUrl}`],
     staleTime: 1200000,
+    enabled: !!videoUrl,
   });
 
   const vidSrc = useMemo(() => {
@@ -51,6 +59,7 @@ const PlayerModal = ({ videoUrl, onClose, changeVideoUrl }) => {
 
   const onEpisodeChange = useCallback((val) => {
     if (val) {
+      console.log("VALlll::", val);
       setCurrentEpisode(val);
       changeVideoUrl(val[0].value);
     }
@@ -62,9 +71,9 @@ const PlayerModal = ({ videoUrl, onClose, changeVideoUrl }) => {
     }
   }, [episodesOptions, videoUrl]);
 
-  const currentAnime = useMemo(() => {
+  useEffect(() => {
     if (data?.data?.animeInfo) {
-      return data?.data?.animeInfo;
+      setCurrentAnime(data?.data?.animeInfo);
     }
   }, [data?.data?.animeInfo]);
 
@@ -73,32 +82,27 @@ const PlayerModal = ({ videoUrl, onClose, changeVideoUrl }) => {
     isLoading: isFetchingAnime,
     isFetching: fetchingAnime,
   } = useQuery({
+    enabled: !!currentAnime,
     queryFn: async () => {
-      return await fetchData(`/details/${currentAnime}`);
+      return await fetchData(
+        `/details/${currentAnime}?extractEpisode=${!!currentStreamingAnime}`
+      );
     },
     queryKey: [`detail`, currentAnime],
-    enabled: !!currentAnime,
     staleTime: 1200000,
   });
-
-  // const currentAnimeDetail = useMemo(() => {
-  //   if (animeDetail?.data?.animeInfo) {
-  //     return animeDetail?.data?.animeInfo;
-  //   }
-  // }, [animeDetail?.data?.animeInfo]);
-  // console.log('ANIMEdetail::', animeDetail, fetchingAnime, currentAnimeDetail);
 
   return (
     <Modal isOpen={true} onClose={onClose} size="full">
       <ModalOverlay />
-      <ModalContent maxH="80vh" overflow={'hidden'}>
+      <ModalContent maxH="80vh" overflow={"hidden"}>
         <ModalHeader>
           <IconButton icon={<IoMdArrowRoundBack />} onClick={onClose} />
         </ModalHeader>
         <ModalCloseButton />
-        <ModalBody overflow={'auto'}>
+        <ModalBody overflow={"auto"}>
           <Flex gap={4}>
-            <Box flex="1" height={'100%'}>
+            <Box flex="1" height={"100%"}>
               {vidSrc && <VideoPlayer url={vidSrc} />}
               <HStack spacing={4} mt={4}>
                 <Box fontWeight="bold">Episodes:</Box>
@@ -107,16 +111,16 @@ const PlayerModal = ({ videoUrl, onClose, changeVideoUrl }) => {
                   onChange={(val) => onEpisodeChange(val)}
                   options={episodesOptions}
                   loading={episodesOptions?.length === 0}
-                  dropdownPosition={'auto'}
+                  dropdownPosition={"auto"}
                   style={{
-                    color: 'black',
-                    backgroundColor: 'inherit',
-                    minWidth: '100px',
+                    color: "black",
+                    backgroundColor: "inherit",
+                    minWidth: "100px",
                   }}
                 />
               </HStack>
             </Box>
-            {!fetchingAnime && (
+            {!!currentAnime && (
               <Box flex="1">
                 <AnimeDetails animeDetail={animeDetail?.data?.animeInfo} />
               </Box>

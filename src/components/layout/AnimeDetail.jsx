@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from 'react';
-import { Box, Image, Text, VStack, Button } from '@chakra-ui/react';
+import React, { useCallback, useState } from "react";
+import { Box, Image, Text, VStack, Button } from "@chakra-ui/react";
 
 const AnimeDetails = ({ animeDetail }) => {
   const [showFullSummary, setShowFullSummary] = useState(false);
@@ -14,7 +14,7 @@ const AnimeDetails = ({ animeDetail }) => {
         <Image
           src={animeDetail?.imageSrc}
           alt={animeDetail?.animeTitle}
-          height={'50%'}
+          height={"50%"}
           // boxSize="200px" // Adjust the boxSize as needed
           objectFit="cover"
           borderRadius="md"
@@ -38,7 +38,7 @@ const AnimeDetails = ({ animeDetail }) => {
         </Text>
         {animeDetail?.plotSummary?.length > 150 && (
           <Button onClick={handleToggleSummary} colorScheme="teal" size="sm">
-            {showFullSummary ? 'See Less' : 'See More'}
+            {showFullSummary ? "See Less" : "See More"}
           </Button>
         )}
       </VStack>

@@ -1,8 +1,8 @@
-import { useState, useMemo } from 'react';
-import { Carousel } from 'react-responsive-carousel';
-import 'react-responsive-carousel/lib/styles/carousel.min.css';
-import { useQuery } from '@tanstack/react-query';
-import { fetchData } from '../../services/api';
+import { useState, useMemo, useCallback } from "react";
+import { Carousel } from "react-responsive-carousel";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
+import { useQuery } from "@tanstack/react-query";
+import { fetchData } from "../../services/api";
 import {
   Box,
   Image,
@@ -10,17 +10,26 @@ import {
   Text,
   Skeleton,
   useColorMode,
-} from '@chakra-ui/react';
+} from "@chakra-ui/react";
+import PlayerModal from "./PlayerModal";
 
 const AnimeCarousel = () => {
   const colorMode = useColorMode();
   const [hoveredIndex, setHoveredIndex] = useState(-1);
   const { data: slides, isLoading } = useQuery({
-    queryKey: ['carouselData'],
+    queryKey: ["carouselData"],
     queryFn: async () => {
-      return await fetchData('/popular-ongoing', true);
+      return await fetchData("/popular-ongoing", true);
     },
   });
+
+  const [selectedAnimeUrl, setSelectedAnimeUrl] = useState(null);
+
+  const handleCardClick = useCallback((videoUrl) => {
+    // setSelectedVideoUrl(videoUrl);
+    console.log("URLll:", videoUrl);
+    setSelectedAnimeUrl(videoUrl);
+  }, []);
 
   const popularAnime = useMemo(() => {
     if (Array.isArray(slides?.data?.popularAnime)) {
@@ -36,11 +45,13 @@ const AnimeCarousel = () => {
     );
   }
 
+  console.log("popo000", popularAnime);
+
   return (
     <Box
-      maxWidth={'inherit'}
+      maxWidth={"inherit"}
       mx="auto"
-      borderColor={colorMode === 'dark' ? 'gray.700' : 'gray.300'} // Adjust the border color for dark and light modes
+      borderColor={colorMode === "dark" ? "gray.700" : "gray.300"} // Adjust the border color for dark and light modes
       borderRadius="md"
       overflow="hidden"
       boxShadow="md"
@@ -55,7 +66,7 @@ const AnimeCarousel = () => {
         centerSlidePercentage={33.3}
         slidesToShow={3}
         dynamicHeight={true}
-        transitionTime={'0.3s'}
+        transitionTime={"0.3s"}
       >
         {popularAnime &&
           popularAnime.length > 0 &&
@@ -69,9 +80,9 @@ const AnimeCarousel = () => {
                 overflow="hidden"
                 onMouseEnter={() => setHoveredIndex(idx)}
                 onMouseLeave={() => setHoveredIndex(-1)}
-                boxShadow={isHovered ? '0 4px 6px rgba(0, 0, 0, 0.1)' : 'none'}
-                border={isHovered ? '1px solid rgba(0, 0, 0, 0.1)' : 'none'}
-                cursor={'pointer'}
+                boxShadow={isHovered ? "0 4px 6px rgba(0, 0, 0, 0.1)" : "none"}
+                border={isHovered ? "1px solid rgba(0, 0, 0, 0.1)" : "none"}
+                cursor={"pointer"}
               >
                 <Image
                   src={el.animeImg}
@@ -80,7 +91,7 @@ const AnimeCarousel = () => {
                   maxH="250px"
                   objectFit="contain"
                   objectPosition="center"
-                  filter={isHovered ? 'blur(1px)' : 'none'}
+                  filter={isHovered ? "blur(1px)" : "none"}
                   // onError={(e) => {
                   //   e.target.style.display = 'none'; // Hide the original image
                   // }}
@@ -104,7 +115,13 @@ const AnimeCarousel = () => {
                       {el.title}
                     </Text>
                     <Text>{el.description}</Text>
-                    <Button variant="solid" colorScheme="teal" size="sm" mt={4}>
+                    <Button
+                      variant="solid"
+                      colorScheme="teal"
+                      size="sm"
+                      mt={4}
+                      onClick={() => handleCardClick(el.animeSrc)}
+                    >
                       Watch Now
                     </Button>
                   </Box>
@@ -113,6 +130,15 @@ const AnimeCarousel = () => {
             );
           })}
       </Carousel>
+
+      {/* TODO: Player Model  */}
+      {selectedAnimeUrl && (
+        <PlayerModal
+          currentStreamingAnime={selectedAnimeUrl}
+          onClose={() => handleCardClick(null)} // Close the modal
+          changeVideoUrl={handleCardClick}
+        />
+      )}
     </Box>
   );
 };
