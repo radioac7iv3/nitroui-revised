@@ -31,17 +31,21 @@ const PlayerModal = ({
   changeVideoUrl,
   currentStreamingAnime = null,
 }) => {
-  const queryCache = new QueryCache({});
   const [currentEpisode, setCurrentEpisode] = useState([]);
+  const [tempVideoUrl, setTempVideoUrl] = useState(videoUrl ?? "");
   const [currentAnime, setCurrentAnime] = useState(currentStreamingAnime ?? "");
   const { data, isLoading } = useQuery({
     queryFn: async () => {
-      return await fetchData(`/watch${videoUrl}`);
+      return await fetchData(`/watch${tempVideoUrl}`);
     },
-    queryKey: [`${videoUrl}`],
+    queryKey: [`${tempVideoUrl}`],
     staleTime: 1200000,
-    enabled: !!videoUrl,
+    enabled: !!tempVideoUrl,
   });
+
+  useEffect(() => {
+    if (videoUrl) setTempVideoUrl(videoUrl);
+  }, [videoUrl]);
 
   const vidSrc = useMemo(() => {
     if (Array.isArray(data?.data?.source)) {
@@ -49,27 +53,12 @@ const PlayerModal = ({
     }
   }, [data]);
 
-  const episodes = useMemo(() => {
-    return data?.data?.epList?.nonActiveEpisodes || [];
-  }, [data]);
-
-  const episodesOptions = useMemo(() => {
-    return processEpisodeList(episodes, videoUrl) || [];
-  }, [episodes, videoUrl]);
-
   const onEpisodeChange = useCallback((val) => {
     if (val) {
-      console.log("VALlll::", val);
       setCurrentEpisode(val);
       changeVideoUrl(val[0].value);
     }
   }, []);
-
-  useEffect(() => {
-    if (episodesOptions && episodesOptions?.length > 0) {
-      setCurrentEpisode([episodesOptions?.find((el) => el.value === videoUrl)]);
-    }
-  }, [episodesOptions, videoUrl]);
 
   useEffect(() => {
     if (data?.data?.animeInfo) {
@@ -91,6 +80,25 @@ const PlayerModal = ({
     queryKey: [`detail`, currentAnime],
     staleTime: 1200000,
   });
+
+  const episodesOptions = useMemo(() => {
+    if (animeDetail?.data?.animeInfo?.episodeList) {
+      return animeDetail?.data?.animeInfo?.episodeList;
+    } else {
+      return [];
+    }
+  }, [animeDetail]);
+
+  useEffect(() => {
+    if (episodesOptions && episodesOptions?.length > 0 && tempVideoUrl) {
+      setCurrentEpisode([
+        episodesOptions?.find((el) => el.value === tempVideoUrl),
+      ]);
+    } else if (!tempVideoUrl && episodesOptions?.length > 0) {
+      // Fallback to default to 0
+      setTempVideoUrl(episodesOptions[0].value);
+    }
+  }, [episodesOptions, tempVideoUrl]);
 
   return (
     <Modal isOpen={true} onClose={onClose} size="full">

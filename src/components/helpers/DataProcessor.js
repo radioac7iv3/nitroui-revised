@@ -4,9 +4,9 @@ export const extractAnimeName = (currentAnimeType, availableAnimeArr = []) => {
   )?.[0]?.name;
 };
 
-export const processEpisodeList = (allEpList = [], demoUrl = '') => {
+export const processEpisodeList = (allEpList = [], demoUrl = "") => {
   if (allEpList?.length === 0) return [];
-
+  console.log("episodesss::", allEpList, demoUrl);
   allEpList.sort((a, b) => parseInt(a.episodeStart) - parseInt(b.episodeStart));
 
   let episodes = [];
@@ -18,6 +18,7 @@ export const processEpisodeList = (allEpList = [], demoUrl = '') => {
     ) {
       if (i === 0) continue; // Skip i = 0
       let episodeUrl = demoUrl.replace(/\d+$/, i);
+      console.log("lablel::", i, "value::", episodeUrl);
       episodes.push({
         label: i,
         value: episodeUrl,
@@ -29,7 +30,7 @@ export const processEpisodeList = (allEpList = [], demoUrl = '') => {
 };
 
 export const processAnimeName = (url) => {
-  if (!url) return '';
-
-  return url.split('-episode')[0];
+  if (!url) return "";
+  console.log("OOOO:::", url);
+  return url.split("-episode")[0];
 };

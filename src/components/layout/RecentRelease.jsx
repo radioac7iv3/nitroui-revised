@@ -1,12 +1,12 @@
-import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
-import { Box, Grid, Heading, Skeleton } from '@chakra-ui/react';
-import RecentAnimeCard from './RecentAnimeCard';
-import { PlayerModal } from './index';
-import { useMemo, useContext, useState, useCallback } from 'react';
-import { fetchData } from '../../services/api';
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { Box, Grid, Heading, Skeleton } from "@chakra-ui/react";
+import RecentAnimeCard from "./RecentAnimeCard";
+import { PlayerModal } from "./index";
+import { useMemo, useContext, useState, useCallback } from "react";
+import { fetchData } from "../../services/api";
 
-import { PageContext } from '../../store/page-context';
+import { PageContext } from "../../store/page-context";
 
 const RecentRelease = () => {
   // const [selectedVideoUrl, setSelectedVideoUrl] = useState(null); // Track selected video URL for the modal
@@ -20,7 +20,7 @@ const RecentRelease = () => {
         `/recent-release?page=${currentPage}&type=${animeType}`
       );
     },
-    queryKey: ['RECENT_RELEASE', `${currentPage}`, `${animeType}`],
+    queryKey: ["RECENT_RELEASE", `${currentPage}`, `${animeType}`],
   });
 
   const animeList = useMemo(() => {
@@ -33,6 +33,8 @@ const RecentRelease = () => {
     // setSelectedVideoUrl(videoUrl);
     setSelectedAnimeUrl(videoUrl);
   }, []);
+
+  console.log("URLL::", animeList);
 
   return (
     <Box p="4">
