@@ -17,3 +17,9 @@ npm run dev
 Want to contribute? Great
 
 Feel Free to Fork and make a PR, I will merge the Code if the code looks safe. Happy Coding!
+
+## Sponsor this project
+
+Contributions are always welcome!
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/radioac7iv3)
