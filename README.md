@@ -1,8 +1,19 @@
-# React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Nitro-ui - A UI Built on React to Watch Anime
 
-Currently, two official plugins are available:
+Welcome to the Nitro UI, a modern and feature-rich user interface built on React.js, Chakra UI, React Query and much more. This application provides a seamless and enjoyable experience for anime enthusiasts to discover, and watch their favorite anime series.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Getting Started
+
+```sh
+git clone 
+cd nitroui-revised
+npm install
+npm run dev
+```
+> Note: Backend Server (https://github.com/radioac7iv3/gogoanime) Needs to be running before using this UI
+
+## Development
+Want to contribute? Great
+
+Feel Free to Fork and make a PR, I will merge the Code if the code looks safe. Happy Coding!
