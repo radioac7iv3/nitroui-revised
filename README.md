@@ -1,7 +1,7 @@
 
 # Nitro-ui - A UI Built on React.js to Watch Anime For Free
 
-Welcome to the Nitro UI, a modern and feature-rich user interface built on React.js, Chakra UI, React Query and much more. This application provides a seamless and enjoyable experience for anime enthusiasts to discover, and watch their favorite anime series.
+Welcome to the Nitro UI, a modern and feature-rich user interface built on React.js, Chakra UI, React Query and much more. This application provides a seamless and enjoyable experience for anime enthusiasts to discover, and watch their favorite anime series. (Still in Development)
 
 ## Getting Started
 
