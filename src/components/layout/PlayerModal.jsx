@@ -122,22 +122,22 @@ const PlayerModal = ({
   return (
     <Modal isOpen={true} onClose={onClose} size="full">
       <ModalOverlay />
-      <ModalContent maxH="80vh" overflow={'hidden'}>
+      <ModalContent maxW="100%" maxH="100%" overflow="hidden">
         <ModalHeader>
           <IconButton icon={<IoMdArrowRoundBack />} onClick={onClose} />
         </ModalHeader>
         <ModalCloseButton />
-        <ModalBody overflow={'auto'}>
-          <Flex gap={4}>
-            <Box flex="1" height={'100%'}>
-              <VideoPlayer url={vidSrc || ''} />
+        <ModalBody overflow="auto">
+          <Flex direction={{ base: 'column', md: 'row' }} gap={4}>
+            <Box flex={{ base: '1', md: '1' }} mb={{ base: '4', md: '0' }}>
+              <VideoPlayer url={vidSrc} />
               <HStack spacing={4} mt={4}>
                 <Box fontWeight="bold">Episodes:</Box>
                 <Select
-                  values={defaultEp || []}
+                  values={defaultEp}
                   onChange={(val) => onEpisodeChange(val)}
                   options={episodesOptions}
-                  loading={episodesOptions?.length === 0}
+                  loading={isFetchingAnime || isLoading}
                   dropdownPosition={'auto'}
                   style={{
                     color: 'black',
@@ -147,7 +147,7 @@ const PlayerModal = ({
                 />
               </HStack>
             </Box>
-            <Box flex="1">
+            <Box flex={{ base: '1', md: '1' }}>
               <AnimeDetails animeDetail={animeDetail?.data?.animeInfo} />
             </Box>
           </Flex>
