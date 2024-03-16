@@ -1,5 +1,5 @@
 // FullScreenModal.js
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Modal,
   ModalOverlay,
@@ -16,14 +16,14 @@ import {
   Link,
   HStack,
   Flex,
-} from "@chakra-ui/react";
-import VideoPlayer from "../video/videoPlayer";
-import { fetchData } from "../../services/api";
-import { useQuery, QueryCache } from "@tanstack/react-query";
-import Select from "react-dropdown-select";
-import { processAnimeName, processEpisodeList } from "../helpers/DataProcessor";
-import AnimeDetails from "./AnimeDetail";
-import { IoMdArrowRoundBack } from "react-icons/io";
+} from '@chakra-ui/react';
+import VideoPlayer from '../video/videoPlayer';
+import { fetchData } from '../../services/api';
+import { useQuery, QueryCache } from '@tanstack/react-query';
+import Select from 'react-dropdown-select';
+import { processAnimeName, processEpisodeList } from '../helpers/DataProcessor';
+import AnimeDetails from './AnimeDetail';
+import { IoMdArrowRoundBack } from 'react-icons/io';
 
 const PlayerModal = ({
   videoUrl,
@@ -31,108 +31,125 @@ const PlayerModal = ({
   changeVideoUrl,
   currentStreamingAnime = null,
 }) => {
-  const [currentEpisode, setCurrentEpisode] = useState([]);
-  const [tempVideoUrl, setTempVideoUrl] = useState(videoUrl ?? "");
-  const [currentAnime, setCurrentAnime] = useState(currentStreamingAnime ?? "");
-  const { data, isLoading } = useQuery({
-    queryFn: async () => {
-      return await fetchData(`/watch${tempVideoUrl}`);
-    },
-    queryKey: [`${tempVideoUrl}`],
-    staleTime: 1200000,
-    enabled: !!tempVideoUrl,
-  });
+  const [defaultEp, setDefaultEp] = useState([]);
+  const [currentAnimeValue, setCurrentAnimeValue] = useState('');
+  const [currentAnimeInfo, setCurrentAnimeInfo] = useState('');
 
+  const [currentStrAnime, setCurrentStrAnime] = useState(
+    currentStreamingAnime ?? null
+  );
   useEffect(() => {
-    if (videoUrl) setTempVideoUrl(videoUrl);
-  }, [videoUrl]);
-
-  const vidSrc = useMemo(() => {
-    if (Array.isArray(data?.data?.source)) {
-      return data?.data?.source[0]?.file;
+    if (currentStreamingAnime) {
+      setCurrentStrAnime(currentStreamingAnime);
     }
-  }, [data]);
-
-  const onEpisodeChange = useCallback((val) => {
-    if (val) {
-      setCurrentEpisode(val);
-      changeVideoUrl(val[0].value);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (data?.data?.animeInfo) {
-      setCurrentAnime(data?.data?.animeInfo);
-    }
-  }, [data?.data?.animeInfo]);
+  }, [currentStreamingAnime]);
 
   const {
     data: animeDetail,
     isLoading: isFetchingAnime,
     isFetching: fetchingAnime,
   } = useQuery({
-    enabled: !!currentAnime,
+    enabled: !!currentStrAnime,
     queryFn: async () => {
       return await fetchData(
-        `/details/${currentAnime}?extractEpisode=${!!currentStreamingAnime}`
+        `/details/${currentStrAnime}?extractEpisode=${!!currentStrAnime}`
       );
     },
-    queryKey: [`detail`, currentAnime],
+    queryKey: [`detail`, currentStrAnime],
     staleTime: 1200000,
   });
 
+  // Extracting Episide list from animeDetail and Setitng 1st Episode as Default
   const episodesOptions = useMemo(() => {
-    if (animeDetail?.data?.animeInfo?.episodeList) {
+    if (animeDetail && animeDetail?.data?.animeInfo?.episodeList?.length > 0)
       return animeDetail?.data?.animeInfo?.episodeList;
-    } else {
-      return [];
-    }
   }, [animeDetail]);
 
   useEffect(() => {
-    if (episodesOptions && episodesOptions?.length > 0 && tempVideoUrl) {
-      setCurrentEpisode([
-        episodesOptions?.find((el) => el.value === tempVideoUrl),
-      ]);
-    } else if (!tempVideoUrl && episodesOptions?.length > 0) {
-      // Fallback to default to 0
-      setTempVideoUrl(episodesOptions[0].value);
+    if (
+      episodesOptions &&
+      episodesOptions?.length > 0 &&
+      defaultEp?.length === 0
+    ) {
+      // Set Default Episode as the latest
+      setDefaultEp([animeDetail?.data?.animeInfo?.episodeList[0]]);
+      setCurrentAnimeInfo(true);
     }
-  }, [episodesOptions, tempVideoUrl]);
+  }, [episodesOptions]);
+
+  useEffect(() => {
+    if (defaultEp && Array.isArray(defaultEp) && defaultEp?.length > 0) {
+      setCurrentAnimeValue(defaultEp[0].value);
+    }
+  }, [defaultEp]);
+
+  // Call Currently Selected Anime Episode URL:
+
+  const { data: AnimeSrcLink, isLoading } = useQuery({
+    queryFn: async () => {
+      return await fetchData(`/watch${currentAnimeValue}`);
+    },
+    queryKey: [`${currentAnimeValue}`],
+    staleTime: 1200000,
+    enabled: !!currentAnimeValue,
+  });
+
+  const vidSrc = useMemo(() => {
+    if (Array.isArray(AnimeSrcLink?.data?.source)) {
+      return AnimeSrcLink?.data?.source[0].file;
+    }
+  }, [AnimeSrcLink]);
+
+  useEffect(() => {
+    if (AnimeSrcLink && !currentStrAnime) {
+      setCurrentStrAnime(AnimeSrcLink?.data?.animeInfo);
+    }
+  }, [AnimeSrcLink]);
+
+  const onEpisodeChange = useCallback((val) => {
+    if (val) {
+      setDefaultEp([...val]);
+      setCurrentAnimeValue(val[0].value);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (videoUrl) {
+      setCurrentAnimeValue(videoUrl);
+    }
+  }, [videoUrl]);
 
   return (
     <Modal isOpen={true} onClose={onClose} size="full">
       <ModalOverlay />
-      <ModalContent maxH="80vh" overflow={"hidden"}>
+      <ModalContent maxH="80vh" overflow={'hidden'}>
         <ModalHeader>
           <IconButton icon={<IoMdArrowRoundBack />} onClick={onClose} />
         </ModalHeader>
         <ModalCloseButton />
-        <ModalBody overflow={"auto"}>
+        <ModalBody overflow={'auto'}>
           <Flex gap={4}>
-            <Box flex="1" height={"100%"}>
-              {vidSrc && <VideoPlayer url={vidSrc} />}
+            <Box flex="1" height={'100%'}>
+              <VideoPlayer url={vidSrc || ''} />
               <HStack spacing={4} mt={4}>
                 <Box fontWeight="bold">Episodes:</Box>
                 <Select
-                  values={currentEpisode}
+                  values={defaultEp || []}
                   onChange={(val) => onEpisodeChange(val)}
                   options={episodesOptions}
                   loading={episodesOptions?.length === 0}
-                  dropdownPosition={"auto"}
+                  dropdownPosition={'auto'}
                   style={{
-                    color: "black",
-                    backgroundColor: "inherit",
-                    minWidth: "100px",
+                    color: 'black',
+                    backgroundColor: 'inherit',
+                    minWidth: '100px',
                   }}
                 />
               </HStack>
             </Box>
-            {!!currentAnime && (
-              <Box flex="1">
-                <AnimeDetails animeDetail={animeDetail?.data?.animeInfo} />
-              </Box>
-            )}
+            <Box flex="1">
+              <AnimeDetails animeDetail={animeDetail?.data?.animeInfo} />
+            </Box>
           </Flex>
         </ModalBody>
       </ModalContent>

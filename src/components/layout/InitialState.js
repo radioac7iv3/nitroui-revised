@@ -51,18 +51,6 @@ export const navHeaders = [
   },
 
   {
-    type: 'searchBar',
-    name: 'search',
-    position: 'right',
-  },
-
-  {
-    type: 'icon',
-    name: 'searchIcon',
-    position: 'right',
-  },
-
-  {
     type: 'icon',
     name: 'userAvatar',
     content: 'username',

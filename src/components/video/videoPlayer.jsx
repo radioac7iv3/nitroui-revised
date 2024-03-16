@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
+import './videoPlayer.css';
 
 const playerConfig = {
   autoPlay: false,
@@ -9,13 +10,22 @@ const playerConfig = {
 };
 
 const VideoPlayer = (props) => {
+  // const player = useRef(null);
   const { url } = props;
 
-  const vidUrl = useMemo(() => {
-    return url || '';
-  }, [url]);
+  // const [vidUrl, setVidUrl] = useState('');
 
-  return <ReactPlayer url={vidUrl} {...playerConfig} />;
+  const vidUrl = useMemo(() => {
+    return url;
+  }, [url]);
+  return (
+    <>
+      <div className="player-wrapper">
+        <ReactPlayer className="react-player" url={vidUrl} {...playerConfig} />
+      </div>
+    </>
+    // <ReactPlayer className="react-player" url={vidUrl} {...playerConfig} />
+  );
 };
 
 export default VideoPlayer;
