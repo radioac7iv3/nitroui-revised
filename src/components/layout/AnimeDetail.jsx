@@ -19,19 +19,24 @@ const AnimeDetails = ({ animeDetail }) => {
   }, [showFullSummary]);
 
   const animationKeyframes = keyframes`
-  0% { transform: scale(1) rotate(0); border-radius: 20%; }
-  25% { transform: scale(2) rotate(0); border-radius: 20%; }
+  0% { transform: scale(0.5) rotate(0); border-radius: 20%; }
+  20% { transform: scale(0.5) rotate(0); border-radius: 20%; }
 
 `;
 
   const animation = `${animationKeyframes} 2s ease-in-out infinite`;
 
   return (
-    <Box p={4} borderWidth="1px" borderRadius="lg" width="60%">
+    <Box
+      p={4}
+      borderWidth="1px"
+      borderRadius="lg"
+      width={{ base: '100%', md: '60%' }}
+    >
       <VStack align="center" spacing={4}>
         {!animeDetail ? (
           <Container display="flex" alignItems="center" justifyContent="center">
-            <Box as={motion.div} animation={animation}>
+            <Box p="4" as={motion.div} animation={animation}>
               Loading...
             </Box>
           </Container>
@@ -41,7 +46,6 @@ const AnimeDetails = ({ animeDetail }) => {
               src={animeDetail?.imageSrc}
               alt={animeDetail?.animeTitle}
               height={'50%'}
-              // boxSize="200px" // Adjust the boxSize as needed
               objectFit="cover"
               borderRadius="md"
             />
