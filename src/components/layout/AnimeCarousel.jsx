@@ -10,12 +10,16 @@ import {
   Text,
   Skeleton,
   useColorMode,
+  useBreakpointValue,
 } from '@chakra-ui/react';
 import PlayerModal from './PlayerModal';
 
 const AnimeCarousel = () => {
   const colorMode = useColorMode();
   const [hoveredIndex, setHoveredIndex] = useState(-1);
+  // Determine the number of slides to show and the center slide percentage based on screen size
+  const slidesToShow = useBreakpointValue({ base: 1, sm: 3 });
+  const centerSlidePercentage = useBreakpointValue({ base: 100, sm: 33.3 });
   const { data: slides, isLoading } = useQuery({
     queryKey: ['carouselData'],
     queryFn: async () => {
@@ -60,8 +64,8 @@ const AnimeCarousel = () => {
         autoPlay={true}
         infiniteLoop={true}
         centerMode={true}
-        centerSlidePercentage={33.3}
-        slidesToShow={3}
+        centerSlidePercentage={centerSlidePercentage}
+        slidesToShow={slidesToShow}
         dynamicHeight={true}
         transitionTime={'0.3s'}
       >

@@ -36,7 +36,7 @@ const RecentRelease = () => {
 
   return (
     <Box p="4">
-      <Grid templateColumns="repeat(auto-fill, minmax(180px, 1fr))">
+      <Grid templateColumns="repeat(auto-fill, minmax(160px, 1fr))">
         {isLoading
           ? // Skeleton loader for when data is loading
             Array.from({ length: 12 }).map((_, index) => (
