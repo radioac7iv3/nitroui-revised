@@ -107,9 +107,9 @@ const PlayerModal = ({
   }, [AnimeSrcLink]);
 
   const onEpisodeChange = useCallback((val) => {
-    if (val) {
+    if (val && Array.isArray(val)) {
       setDefaultEp([...val]);
-      setCurrentAnimeValue(val[0].value);
+      setCurrentAnimeValue(val?.[0]?.value);
     }
   }, []);
 
@@ -134,7 +134,7 @@ const PlayerModal = ({
               <HStack spacing={4} mt={4}>
                 <Box fontWeight="bold">Episodes:</Box>
                 <Select
-                  values={defaultEp}
+                  values={defaultEp || []}
                   onChange={(val) => onEpisodeChange(val)}
                   options={episodesOptions}
                   loading={isFetchingAnime || isLoading}

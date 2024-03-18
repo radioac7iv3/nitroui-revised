@@ -34,8 +34,6 @@ const RecentRelease = () => {
     setSelectedAnimeUrl(videoUrl);
   }, []);
 
-  console.log('URLL::', animeList);
-
   return (
     <Box p="4">
       <Grid templateColumns="repeat(auto-fill, minmax(180px, 1fr))">
