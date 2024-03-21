@@ -1,6 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { Box, Grid, Heading, Skeleton } from '@chakra-ui/react';
+import {
+  Box,
+  Grid,
+  Heading,
+  Skeleton,
+  useBreakpointValue,
+} from '@chakra-ui/react';
 import RecentAnimeCard from './RecentAnimeCard';
 import { PlayerModal } from './index';
 import { useMemo, useContext, useState, useCallback } from 'react';
@@ -13,6 +19,13 @@ const RecentRelease = () => {
   const [selectedAnimeUrl, setSelectedAnimeUrl] = useState(null);
   const { currentPage, animeType, currentVideoUrl, setCurrentVideoUrl } =
     useContext(PageContext);
+
+  const gridSetting = useBreakpointValue({
+    base: '160px',
+    sm: '160px',
+    md: '160px',
+    lg: '180px',
+  });
 
   const { data, isLoading } = useQuery({
     queryFn: async () => {
@@ -36,7 +49,7 @@ const RecentRelease = () => {
 
   return (
     <Box p="4">
-      <Grid templateColumns="repeat(auto-fill, minmax(160px, 1fr))">
+      <Grid templateColumns={`repeat(auto-fill, minmax(${gridSetting}, 1fr))`}>
         {isLoading
           ? // Skeleton loader for when data is loading
             Array.from({ length: 12 }).map((_, index) => (
